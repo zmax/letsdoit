@@ -50,11 +50,14 @@
 
 module.exports = function(grunt) {
 
+  var pkg = grunt.file.readJSON('package.json');
+
   // Project configuration.
   grunt.initConfig({
 
     pkg: grunt.file.readJSON('package.json'),
 
+    // Compile CoffeeScript to `app/js/lib`, ignore app.coffee if glob to multiple.
     coffee: {
 
       glob_to_multiple: {
@@ -62,9 +65,17 @@ module.exports = function(grunt) {
         expand: true,
         // flatten: true,
         cwd: 'app/coffee',
-        src: ['**/*.coffee'],
+        src: ['**/*.coffee', '!app.coffee'],
         dest: 'app/js',
         ext: '.js'
+
+      },
+
+      compile_to_single: {
+
+        files: {
+          "app/js/<%= pkg.settings.coffee.filename %>": ['app/coffee/**/*.coffee']
+        }
 
       }
 
@@ -80,6 +91,22 @@ module.exports = function(grunt) {
           config: 'app/compass/foundation4/config.rb',
           basePath: 'app/compass/foundation4'
         }
+      }
+
+    },
+
+    sass: {
+
+      app: {
+
+        options: {
+
+        },
+
+        files: {
+          'app/css/app.css': 'app/sass/**/*.scss'
+        }
+
       }
 
     },
@@ -228,6 +255,11 @@ module.exports = function(grunt) {
 
     watch: {
 
+      packageJson: {
+        files: 'package.json',
+        tasks: ['compile']
+      },
+
       // Re-Grunt default task when gruntfile is changed.
       gruntfile: {
         files: 'Gruntfile.js',
@@ -237,13 +269,22 @@ module.exports = function(grunt) {
       // Re-compile coffee scripts when they are changed.
       coffee: {
         files: 'app/coffee/**/*.coffee',
-        tasks: ['coffee']
+        tasks: ['compileCoffee']
       },
 
       // Re-Compass and Publish to public css folder when SCSS files is changed in foundation project.
-      zf4_css: {
+      zf4_compass: {
         files: 'app/compass/**/*.scss',
         tasks: ['zf4css']
+      },
+
+      b2_less: {
+        files: 'app/components/bootstrap/less/*.less',
+        tasks: ['less:b2'],
+        options: {
+          // interrupt: true,
+          // nospawn: true
+        }
       },
 
       zf4_uglify_js: {
@@ -256,14 +297,31 @@ module.exports = function(grunt) {
         tasks: ['uglify:b2js']
       },
 
-      app_js: {
-        files: 'app/js/**/*.js',
-        tasks: ['copy:js']
+      app_sass: {
+        files: 'app/sass/**/*.scss',
+        tasks: ['sass:app'],
+        options: {
+          // interrupt: true,
+          // nospawn: true
+        }
       },
 
       app_css: {
         files: 'app/css/**/*.css',
-        tasks: ['copy:css']
+        tasks: ['copy:css'],
+        options: {
+          // interrupt: true,
+          // nospawn: true
+        }
+      },
+
+      app_js: {
+        files: 'app/js/**/*.js',
+        tasks: ['copy:js'],
+        options: {
+          // interrupt: true,
+          // nospawn: true
+        }
       },
 
       // Live Reload
@@ -272,7 +330,7 @@ module.exports = function(grunt) {
         options: {
           livereload: true,
           // no child process, so we only have once livereload
-          nospawn: true,
+          // nospawn: true,
           // interrupt: true
         }
       }
@@ -285,15 +343,27 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-compass');
+  grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  // Default task(s).
-  grunt.registerTask('default', ['compile', 'watch']);
+  // grunt.event.on('watch', function(action, filepath, target) {
 
-  grunt.registerTask('compile', ['coffee', 'foundation', 'bootstrap', 'copy:css', 'copy:js', 'uglify']); 
+  //   grunt.log.writeln( 'EVENT: ' + target + ': ' + filepath + ' has ' + action);
+
+  // });
+
+  // doNoThing ...
+  grunt.registerTask('null',[]);
+
+  // Default task(s).
+  grunt.registerTask('default', ['compile', 'copy', 'watch']);
+
+  grunt.registerTask('compileCoffee', [( pkg.settings.coffee.enable === true ) ? ( ( pkg.settings.coffee.concat === true) ? 'coffee:compile_to_single' : 'coffee:glob_to_multiple' ) : 'null']);
+
+  grunt.registerTask('compile', [ 'compileCoffee', 'sass:app', 'foundation', 'bootstrap', 'copy:css', 'copy:js', 'uglify']); 
 
   /*
 
@@ -321,6 +391,6 @@ module.exports = function(grunt) {
 
 
   // Re-compile CSS files - Foundation -> Bootstrap
-  grunt.registerTask('css', ['zf4css', 'b2css']);
+  grunt.registerTask('css', ['sass:app', 'zf4css', 'b2css']);
 
 };
