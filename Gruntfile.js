@@ -1,3 +1,53 @@
+/*
+ 
+ 
+     .o8                                                         .o8  
+    "888                                                        "888  
+     888oooo.   .ooooo.  oooo    ooo  .ooooo.  ooo. .oo.    .oooo888  
+     d88' `88b d88' `88b  `88.  .8'  d88' `88b `888P"Y88b  d88' `888  
+     888   888 888ooo888   `88..8'   888   888  888   888  888   888  
+     888   888 888    .o    `888'    888   888  888   888  888   888  
+     `Y8bod8P' `Y8bod8P'     .8'     `Y8bod8P' o888o o888o `Y8bod88P" Inc.
+                         .o..P'                                       
+                         `Y8P'                                        
+
+
+  Let's Do It!
+
+  @version        1.0
+  @author         Starck Lin
+  @copyright      /dev/null
+
+
+  founcation:
+
+    zf4css:  [ compass:zf4  -> concat:zf4css ]
+    zf4js:   [ concat:zf4js -> copy:zf4_js_vendor ]
+
+  bootstrap:
+
+
+
+  watch:
+    
+    coffee:
+    `app/coffee/*.coffee` => `app/js`
+
+    zf4_css:
+    `app/compass/*.scss` => [zf4css]
+  
+    app_js:
+    `app/js/*.js` => [copy:js]
+    
+    app_css:
+    `app/css/*.css => [copy:css]
+
+    public_all:
+    `public/*` => [livereload]
+
+*/ 
+
+
 module.exports = function(grunt) {
 
   // Project configuration.
@@ -23,7 +73,7 @@ module.exports = function(grunt) {
     compass: {
       
       /*
-        compile foundation4 scss files, it will generate `app/compass/foundation4/css/app.css`
+        Compile Foundation4 compass project, it will generate `app/compass/foundation4/css/app.css`
       */
       zf4: {
         options: {
@@ -37,8 +87,8 @@ module.exports = function(grunt) {
     less: {
 
       /*
-        compile bootstrap less files to `app/css`
-        `bootstrap.css` and `bootstrap-responsive.css`
+        Compile Bootstrap LESS files to `app/css`
+        it will generate `bootstrap.css` and `bootstrap-responsive.css`
       */
       b2: {
         options: {
@@ -60,16 +110,22 @@ module.exports = function(grunt) {
         dest: 'public/js/foundation.all.js'
       },
 
-      // Copy Foundation4 css file to `app/css/foundation.css`
+      // Concat Bootstrap's Javascripts to `public/js/bootstrap.all.js`
+      b2js: {
+        src: ['app/components/bootstrap/js/bootstrap-tooltip.js', 'app/components/bootstrap/js/*.js'],
+        dest: 'public/js/bootstrap.all.js'
+      },
+
+      // Copy Foundation4 css file to `public/css/foundation.css`
       zf4css: {
         src: ['app/compass/foundation4/css/app.css'],
         dest: 'app/css/foundation.css'
       },
 
-      // Concat Bootstrap's Javascripts to `public/js/bootstrap.all.js`
-      b2js: {
-        src: ['app/components/bootstrap/js/bootstrap-tooltip.js', 'app/components/bootstrap/js/*.js'],
-        dest: 'public/js/bootstrap.all.js'
+      // Concat Bootstrap's two CSS file to one.
+      b2css: {
+        src: ['app/css/bootstrap.css', 'app/css/bootstrap-responsive.css'],
+        dest: 'public/css/bootstrap.all.css'
       }
 
     },
@@ -77,7 +133,7 @@ module.exports = function(grunt) {
     copy: {
 
       /*
-        copy `app/css` all files to `public/css`
+        Copy `app/css` all files to `public/css`
       */
       css: {
 
@@ -94,6 +150,9 @@ module.exports = function(grunt) {
 
       },
 
+      /*
+        Copy `app/js` all javascript files to `public/js`, and keep its structure.
+      */
       js: {
 
         files: [
@@ -109,6 +168,9 @@ module.exports = function(grunt) {
 
       },
 
+      /*
+        Copy Bootstrap's images.
+      */
       b2images: {
 
         files: [
@@ -166,28 +228,45 @@ module.exports = function(grunt) {
 
     watch: {
 
-      coffee: {
-        files: 'app/coffee/**/*.coffee',
-        tasks: ['coffee']
-      },
-
       // Re-Grunt default task when gruntfile is changed.
       gruntfile: {
         files: 'Gruntfile.js',
         tasks: ['compile']
       },
 
-      // Re-Compass when compass files are changed.
-      scss: {
-        files: 'app/compass/**/*.scss',
-        tasks: ['compass', 'concat:zf4css']
+      // Re-compile coffee scripts when they are changed.
+      coffee: {
+        files: 'app/coffee/**/*.coffee',
+        tasks: ['coffee']
       },
 
-      css: {
+      // Re-Compass and Publish to public css folder when SCSS files is changed in foundation project.
+      zf4_css: {
+        files: 'app/compass/**/*.scss',
+        tasks: ['zf4css']
+      },
+
+      zf4_uglify_js: {
+        files: '<%= uglify.zf4js.src %>',
+        tasks: ['uglify:zf4js']
+      },
+
+      b2_uglify_js: {
+        files: '<%= uglify.b2js.src %>',
+        tasks: ['uglify:b2js']
+      },
+
+      app_js: {
+        files: 'app/js/**/*.js',
+        tasks: ['copy:js']
+      },
+
+      app_css: {
         files: 'app/css/**/*.css',
         tasks: ['copy:css']
       },
 
+      // Live Reload
       public_all: {
         files: 'public/**/*',
         options: {
@@ -212,11 +291,36 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Default task(s).
-  grunt.registerTask('default', ['compile', 'watch']); 
-  grunt.registerTask('compile', ['coffee','compass', 'less', 'concat','copy:js', 'copy:zf4_js_vendor', 'copy:b2images', 'uglify']); 
-  // Bootstrap 
-  grunt.registerTask('bootstrap', ['less:b2', 'concat:b2js']);
-  // Re-compile CSS files
-  grunt.registerTask('css', ['compass', 'less', 'concat:zf4css', 'copy:css']);
+  grunt.registerTask('default', ['compile', 'watch']);
+
+  grunt.registerTask('compile', ['coffee', 'foundation', 'bootstrap', 'copy:css', 'copy:js', 'uglify']); 
+
+  /*
+
+    Bootstrap: LESS -> CSS -> JS -> Images
+
+  */ 
+
+  grunt.registerTask('bootstrap', ['b2css', 'b2js', 'copy:b2images']);
+  // CSS
+  grunt.registerTask('b2css', ['less:b2', 'concat:b2css']);
+  // JS
+  grunt.registerTask('b2js', ['concat:b2js']);
+
+  /*
+
+    Foundation Compass -> CSS -> JS + Vendor JS
+  
+  */
+
+  grunt.registerTask('foundation', ['zf4css', 'zf4js']);
+  // CSS
+  grunt.registerTask('zf4css', ['compass:zf4', 'concat:zf4css']);
+  // JS
+  grunt.registerTask('zf4js', ['concat:zf4js', 'copy:zf4_js_vendor']);
+
+
+  // Re-compile CSS files - Foundation -> Bootstrap
+  grunt.registerTask('css', ['zf4css', 'b2css']);
 
 };
