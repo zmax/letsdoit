@@ -1,0 +1,24 @@
+{
+  "name": "lets-do-it",
+  "version": "0.0.1",
+  "description": "Don't always Assume, Test your Assumptions. then... Learning by Doing.",
+  "main": "index.js",
+  "dependencies": {
+    "grunt": "~0.4.1"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@repo.beyond.com.tw:root/lets-do-it.git"
+  },
+  "keywords": [
+    "starter"
+  ],
+  "author": "Starck Lin",
+  "license": "BSD"
+}
