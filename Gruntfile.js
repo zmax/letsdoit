@@ -330,7 +330,7 @@ module.exports = function(grunt) {
         options: {
           livereload: true,
           // no child process, so we only have once livereload
-          // nospawn: true,
+          nospawn: true,
           // interrupt: true
         }
       }
