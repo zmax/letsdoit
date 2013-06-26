@@ -1,4 +1,5 @@
 ## Let's do it!
+__letsdoit__ is a website starter, included Zurb Foundation 4+ and Bootstrap 2.3+, it depends on Grunt.js to compile CoffeeScript, SASS, Compass project... and minify them.
 
 
 ### Installation
