@@ -63,13 +63,12 @@ module.exports = function(grunt) {
       // Copy Foundation4 css file to `app/css/foundation.css`
       zf4css: {
         src: ['app/compass/foundation4/css/app.css'],
-        // dest: 'public/css/foundation.css'
         dest: 'app/css/foundation.css'
       },
 
       // Concat Bootstrap's Javascripts to `public/js/bootstrap.all.js`
       b2js: {
-        src: ['app/components/bootstrap/js/*.js'],
+        src: ['app/components/bootstrap/js/bootstrap-tooltip.js', 'app/components/bootstrap/js/*.js'],
         dest: 'public/js/bootstrap.all.js'
       }
 
@@ -85,10 +84,40 @@ module.exports = function(grunt) {
         files: [
 
           {
-            expand:true,
+            expand: true,
             cwd: 'app/css',
             src: ['**/*.css'],
             dest: 'public/css'
+          }
+
+        ]
+
+      },
+
+      js: {
+
+        files: [
+
+          {
+            expand: true,
+            cwd: 'app/js',
+            src: ['**/*.js'],
+            dest: 'public/js'
+          }
+
+        ]
+
+      },
+
+      b2images: {
+
+        files: [
+
+          {
+            expand: true,
+            cwd: 'app/components/bootstrap/img',
+            src: ['**/*.png'],
+            dest: 'public/images'
           }
 
         ]
@@ -184,7 +213,7 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['compile', 'watch']); 
-  grunt.registerTask('compile', ['coffee','compass', 'less', 'concat', 'copy:zf4_js_vendor', 'uglify']); 
+  grunt.registerTask('compile', ['coffee','compass', 'less', 'concat','copy:js', 'copy:zf4_js_vendor', 'copy:b2images', 'uglify']); 
   // Bootstrap 
   grunt.registerTask('bootstrap', ['less:b2', 'concat:b2js']);
   // Re-compile CSS files
