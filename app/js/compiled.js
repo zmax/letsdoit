@@ -31,45 +31,9 @@
 
     function App() {}
 
-    version = 4;
+    version = 1;
 
     return App;
-
-  })();
-
-}).call(this);
-
-(function() {
-  var MyLibs;
-
-  MyLibs = (function() {
-    var name, version;
-
-    function MyLibs() {}
-
-    name = 'mylibs';
-
-    version = '1.0';
-
-    return MyLibs;
-
-  })();
-
-}).call(this);
-
-(function() {
-  var Utils;
-
-  Utils = (function() {
-    var name, version;
-
-    function Utils() {}
-
-    name = 'utils';
-
-    version = '1.0';
-
-    return Utils;
 
   })();
 
