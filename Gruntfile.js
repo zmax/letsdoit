@@ -47,8 +47,11 @@
 
 */ 
 
+require('shelljs/global');
 
 module.exports = function(grunt) {
+
+  // var shell = require('shelljs');
 
   var pkg = grunt.file.readJSON('package.json');
 
@@ -64,9 +67,9 @@ module.exports = function(grunt) {
 
         expand: true,
         // flatten: true,
-        cwd: 'app/coffee',
+        cwd: '<%= pkg.settings.coffee.basePath %>',
         src: ['**/*.coffee', '!app.coffee'],
-        dest: 'app/js',
+        dest: '<%= pkg.settings.app.basePath %>/js',
         ext: '.js'
 
       },
@@ -74,7 +77,7 @@ module.exports = function(grunt) {
       compile_to_single: {
 
         files: {
-          "app/js/<%= pkg.settings.coffee.filename %>": ['app/coffee/**/*.coffee']
+          "<%= pkg.settings.app.basePath %>/js/<%= pkg.settings.coffee.filename %>": ['<%= pkg.settings.coffee.basePath %>/**/*.coffee']
         }
 
       }
@@ -88,8 +91,8 @@ module.exports = function(grunt) {
       */
       zf4: {
         options: {
-          config: 'app/compass/foundation4/config.rb',
-          basePath: 'app/compass/foundation4'
+          config: '<%= pkg.settings.foundation.basePath %>/config.rb',
+          basePath: '<%= pkg.settings.foundation.basePath %>'
         }
       }
 
@@ -104,7 +107,7 @@ module.exports = function(grunt) {
         },
 
         files: {
-          'app/css/app.css': 'app/sass/**/*.scss'
+          '<%= pkg.settings.app.basePath %>/css/app.css': '<%= pkg.settings.app.basePath %>/sass/**/*.scss'
         }
 
       }
@@ -119,11 +122,11 @@ module.exports = function(grunt) {
       */
       b2: {
         options: {
-          paths: 'app/components/bootstrap/less'
+          paths: '<%= pkg.settings.bootstrap.basePath %>/less'
         },
         files: {
-          "app/css/bootstrap.css": "app/components/bootstrap/less/bootstrap.less",
-          "app/css/bootstrap-responsive.css": "app/components/bootstrap/less/responsive.less"
+          "<%= pkg.settings.app.basePath %>/css/bootstrap.css": "<%= pkg.settings.bootstrap.basePath %>/less/bootstrap.less",
+          "<%= pkg.settings.app.basePath %>/css/bootstrap-responsive.css": "<%= pkg.settings.bootstrap.basePath %>/less/responsive.less"
         }
       }
 
@@ -133,26 +136,26 @@ module.exports = function(grunt) {
 
       // Concat Foundation4's Javascripts to `public/js/foundation.all.js`
       zf4js: {
-        src: ['app/compass/foundation4/js/foundation/foundation.js', 'app/compass/foundation4/js/foundation/*.js'],
-        dest: 'public/js/foundation.all.js'
+        src: ['<%= pkg.settings.foundation.basePath %>/js/foundation/foundation.js', '<%= pkg.settings.foundation.basePath %>/js/foundation/*.js'],
+        dest: '<%= pkg.settings.app.outputPath %>/js/foundation.all.js'
       },
 
       // Concat Bootstrap's Javascripts to `public/js/bootstrap.all.js`
       b2js: {
-        src: ['app/components/bootstrap/js/bootstrap-tooltip.js', 'app/components/bootstrap/js/*.js'],
-        dest: 'public/js/bootstrap.all.js'
+        src: ['<%= pkg.settings.bootstrap.basePath %>/js/bootstrap-tooltip.js', '<%= pkg.settings.bootstrap.basePath %>/js/*.js'],
+        dest: '<%= pkg.settings.app.outputPath %>/js/bootstrap.all.js'
       },
 
       // Copy Foundation4 css file to `public/css/foundation.css`
       zf4css: {
-        src: ['app/compass/foundation4/css/app.css'],
-        dest: 'app/css/foundation.css'
+        src: ['<%= pkg.settings.foundation.basePath %>/css/app.css'],
+        dest: '<%= pkg.settings.app.basePath %>/css/foundation.css'
       },
 
       // Concat Bootstrap's two CSS file to one.
       b2css: {
-        src: ['app/css/bootstrap.css', 'app/css/bootstrap-responsive.css'],
-        dest: 'public/css/bootstrap.all.css'
+        src: ['<%= pkg.settings.app.basePath %>/css/bootstrap.css', '<%= pkg.settings.app.basePath %>/css/bootstrap-responsive.css'],
+        dest: '<%= pkg.settings.app.outputPath %>/css/bootstrap.all.css'
       }
 
     },
@@ -168,9 +171,9 @@ module.exports = function(grunt) {
 
           {
             expand: true,
-            cwd: 'app/css',
+            cwd: '<%= pkg.settings.app.basePath %>/css',
             src: ['**/*.css'],
-            dest: 'public/css'
+            dest: '<%= pkg.settings.app.outputPath %>/css'
           }
 
         ]
@@ -186,9 +189,9 @@ module.exports = function(grunt) {
 
           {
             expand: true,
-            cwd: 'app/js',
+            cwd: '<%= pkg.settings.app.basePath %>/js',
             src: ['**/*.js'],
-            dest: 'public/js'
+            dest: '<%= pkg.settings.app.outputPath %>/js'
           }
 
         ]
@@ -204,9 +207,9 @@ module.exports = function(grunt) {
 
           {
             expand: true,
-            cwd: 'app/components/bootstrap/img',
+            cwd: '<%= pkg.settings.bootstrap.basePath %>/img',
             src: ['**/*.png'],
-            dest: 'public/images'
+            dest: '<%= pkg.settings.app.outputPath %>/images'
           }
 
         ]
@@ -223,9 +226,9 @@ module.exports = function(grunt) {
 
           {
             expand: true,
-            cwd: 'app/compass/foundation4/js/vendor',
+            cwd: '<%= pkg.settings.foundation.basePath %>/js/vendor',
             src: ['*.js'],
-            dest: 'public/js/vendor'
+            dest: '<%= pkg.settings.app.outputPath %>/js/vendor'
           }
         ]
 
@@ -242,13 +245,13 @@ module.exports = function(grunt) {
       // Minify Foundation 4 Javascripts
       zf4js: {
         src: '<%= concat.zf4js.dest %>',
-        dest: 'public/js/foundation.all.min.js'
+        dest: '<%= pkg.settings.app.outputPath %>/js/foundation.all.min.js'
       },
 
       // Minify Bootstrap Javascripts
       b2js: {
         src: '<%= concat.b2js.dest %>',
-        dest: 'public/js/bootstrap.all.min.js'
+        dest: '<%= pkg.settings.app.outputPath %>/js/bootstrap.all.min.js'
       }
 
     },
@@ -268,18 +271,18 @@ module.exports = function(grunt) {
 
       // Re-compile coffee scripts when they are changed.
       coffee: {
-        files: 'app/coffee/**/*.coffee',
+        files: '<%= pkg.settings.coffee.basePath %>/**/*.coffee',
         tasks: ['compileCoffee']
       },
 
       // Re-Compass and Publish to public css folder when SCSS files is changed in foundation project.
       zf4_compass: {
-        files: 'app/compass/**/*.scss',
+        files: '<%= pkg.settings.foundation.basePath %>/**/*.scss',
         tasks: ['zf4css']
       },
 
       b2_less: {
-        files: 'app/components/bootstrap/less/*.less',
+        files: '<%= pkg.settings.bootstrap.basePath %>/less/*.less',
         tasks: ['less:b2'],
         options: {
           // interrupt: true,
@@ -298,7 +301,7 @@ module.exports = function(grunt) {
       },
 
       app_sass: {
-        files: 'app/sass/**/*.scss',
+        files: '<%= pkg.settings.app.basePath %>/sass/**/*.scss',
         tasks: ['sass:app'],
         options: {
           // interrupt: true,
@@ -307,7 +310,7 @@ module.exports = function(grunt) {
       },
 
       app_css: {
-        files: 'app/css/**/*.css',
+        files: '<%= pkg.settings.app.basePath %>/css/**/*.css',
         tasks: ['copy:css'],
         options: {
           // interrupt: true,
@@ -316,7 +319,7 @@ module.exports = function(grunt) {
       },
 
       app_js: {
-        files: 'app/js/**/*.js',
+        files: '<%= pkg.settings.app.basePath %>/js/**/*.js',
         tasks: ['copy:js'],
         options: {
           // interrupt: true,
@@ -326,11 +329,12 @@ module.exports = function(grunt) {
 
       // Live Reload
       public_all: {
-        files: 'public/**/*',
+        files: '<%= pkg.settings.app.outputPath %>/**/*',
+        tasks: ['onPublicChanged'],
         options: {
           livereload: true,
           // no child process, so we only have once livereload
-          nospawn: true,
+          // nospawn: true,
           // interrupt: true
         }
       }
@@ -393,4 +397,31 @@ module.exports = function(grunt) {
   // Re-compile CSS files - Foundation -> Bootstrap
   grunt.registerTask('css', ['sass:app', 'zf4css', 'b2css']);
 
+  grunt.registerTask('onPublicChanged', 'testing', function(){
+
+    // grunt.log.writeln( JSON.stringify( this ) );
+
+    // Execute command when something changed in public folder
+    var result = exec('echo "something changed"', {silent:true}).output;
+    grunt.log.writeln( result );
+
+  });
+
+  // grunt.event.on('watch', function(action, filepath, target) {
+
+  //   if( typeof target == 'undefined' ) {
+  //     grunt.log.writeln( "\n> " + filepath + ' has ' + action);
+  //   }else{
+  //     grunt.log.writeln(target + ': ' + filepath + ' has ' + action);
+  //   }
+
+  // });
+
 };
+
+
+
+
+
+
+

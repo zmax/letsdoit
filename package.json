@@ -15,7 +15,8 @@
     "grunt-contrib-watch": "~0.4.4",
     "grunt-contrib-less": "~0.6.1",
     "grunt-contrib-coffee": "~0.7.0",
-    "grunt-contrib-sass": "~0.3.0"
+    "grunt-contrib-sass": "~0.3.0",
+    "shelljs": "~0.1.4"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -30,14 +31,21 @@
   "author": "Starck Lin",
   "license": "BSD",
   "settings": {
-
+    "app": {
+      "basePath": "app",
+      "outputPath": "public"
+    },
+    "foundation": {
+      "basePath": "app/compass/foundation4"
+    },
+    "bootstrap": {
+      "basePath": "app/components/bootstrap"
+    },
     "coffee": {
-
+      "basePath": "app/coffee",
       "enable": true,
       "concat": true,
       "filename": "compiled.js"
-
     }
-
   }
 }
