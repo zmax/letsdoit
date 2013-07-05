@@ -26,6 +26,10 @@
 
   bootstrap:
 
+  font-awesome:
+
+    font-awesome: [ less:font_awesome -> copy:font_awesome ]
+
 
 
   watch:
@@ -128,6 +132,17 @@ module.exports = function(grunt) {
           "<%= pkg.settings.app.basePath %>/css/bootstrap.css": "<%= pkg.settings.bootstrap.basePath %>/less/bootstrap.less",
           "<%= pkg.settings.app.basePath %>/css/bootstrap-responsive.css": "<%= pkg.settings.bootstrap.basePath %>/less/responsive.less"
         }
+      },
+
+      font_awesome: {
+        options: {
+          paths: '<%= pkg.settings.app.basePath %>/components/font-awesome/less'
+        },
+        files: {
+          "<%= pkg.settings.app.basePath %>/css/font-awesome.css": "<%= pkg.settings.app.basePath %>/components/font-awesome/less/font-awesome.less",
+          "<%= pkg.settings.app.basePath %>/css/font-awesome-ie7.css": "<%= pkg.settings.app.basePath %>/components/font-awesome/less/font-awesome-ie7.less",
+          "<%= pkg.settings.app.basePath %>/css/bootstrap-noicons.css": "<%= pkg.settings.app.basePath %>/components/font-awesome/less/bootstrap.less"
+        }
       }
 
     },
@@ -216,6 +231,19 @@ module.exports = function(grunt) {
 
       },
 
+      font_awesome: {
+        files: [
+
+          {
+            expand: true,
+            cwd: '<%= pkg.settings.app.basePath %>/components/font-awesome/font',
+            src: ['*.*'],
+            dest: '<%= pkg.settings.app.outputPath %>/font'
+          }
+
+        ]
+      },
+
       /*
         Copy Foundation4's Vendor Javascripts
         `app/compass/foundation4/js/vendor` all files to `public/js/vendor`
@@ -288,6 +316,11 @@ module.exports = function(grunt) {
           // interrupt: true,
           // nospawn: true
         }
+      },
+
+      font_awesome_less: {
+        files: '<%= pkg.settings.app.basePath %>/components/font-awesome/less/*.less',
+        tasks: ['less:font_awesome']
       },
 
       zf4_uglify_js: {
@@ -367,7 +400,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('compileCoffee', [( pkg.settings.coffee.enable === true ) ? ( ( pkg.settings.coffee.concat === true) ? 'coffee:compile_to_single' : 'coffee:glob_to_multiple' ) : 'null']);
 
-  grunt.registerTask('compile', [ 'compileCoffee', 'sass:app', 'foundation', 'bootstrap', 'copy:css', 'copy:js', 'uglify']); 
+  grunt.registerTask('compile', [ 'compileCoffee', 'sass:app', 'foundation', 'bootstrap', 'font_awesome', 'copy:css', 'copy:js', 'uglify']); 
 
   /*
 
@@ -393,6 +426,12 @@ module.exports = function(grunt) {
   // JS
   grunt.registerTask('zf4js', ['concat:zf4js', 'copy:zf4_js_vendor']);
 
+  /*
+
+    Font-Awesome
+
+  */
+  grunt.registerTask('font_awesome', ['less:font_awesome', 'copy:font_awesome']);
 
   // Re-compile CSS files - Foundation -> Bootstrap
   grunt.registerTask('css', ['sass:app', 'zf4css', 'b2css']);
